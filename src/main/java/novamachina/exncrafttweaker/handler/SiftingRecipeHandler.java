@@ -10,23 +10,26 @@ import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.util.IngredientUtil;
 import com.blamejared.crafttweaker.api.util.StringUtil;
 import com.google.gson.reflect.TypeToken;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Recipe;
-import novamachina.exnihilosequentia.ExNihiloSequentia;
-import novamachina.exnihilosequentia.world.item.crafting.MeshWithChance;
-import novamachina.exnihilosequentia.world.item.crafting.SiftingRecipe;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import novamachina.exnihilosequentia.ExNihiloSequentia;
+import novamachina.exnihilosequentia.world.item.crafting.MeshWithChance;
+import novamachina.exnihilosequentia.world.item.crafting.SiftingRecipe;
 
 @IRecipeHandler.For(SiftingRecipe.class)
 public class SiftingRecipeHandler implements IRecipeHandler<SiftingRecipe> {
   @Override
   public String dumpToCommandString(
-      IRecipeManager<? super SiftingRecipe> manager, SiftingRecipe recipe) {
+      IRecipeManager<? super SiftingRecipe> manager,
+      RegistryAccess registryAccess,
+      RecipeHolder<SiftingRecipe> recipe) {
     StringJoiner rollJoiner = new StringJoiner(", ");
-    for (MeshWithChance roll : recipe.getRolls()) {
+    for (MeshWithChance roll : recipe.value().getRolls()) {
       rollJoiner.add(
           String.format(
               "MeshWithChance.of(%s, %f)",
@@ -34,10 +37,10 @@ public class SiftingRecipeHandler implements IRecipeHandler<SiftingRecipe> {
     }
     return String.format(
         "<recipetype:exnihilosequentia:sifting>.addRecipe(%s, %s, %s, %b, [%s]);",
-        StringUtil.quoteAndEscape(recipe.getId()),
-        IIngredient.fromIngredient(recipe.getInput()).getCommandString(),
-        IItemStack.of(recipe.getDrop()).getCommandString(),
-        recipe.isWaterlogged(),
+        StringUtil.quoteAndEscape(recipe.id()),
+        IIngredient.fromIngredient(recipe.value().getInput()).getCommandString(),
+        IItemStack.of(recipe.value().getDrop()).getCommandString(),
+        recipe.value().isWaterlogged(),
         rollJoiner);
   }
 
@@ -63,7 +66,9 @@ public class SiftingRecipeHandler implements IRecipeHandler<SiftingRecipe> {
 
   @Override
   public Optional<IDecomposedRecipe> decompose(
-      IRecipeManager<? super SiftingRecipe> manager, SiftingRecipe recipe) {
+      IRecipeManager<? super SiftingRecipe> manager,
+      RegistryAccess registryAccess,
+      SiftingRecipe recipe) {
     IIngredient input = IIngredient.fromIngredient(recipe.getInput());
     IItemStack drop = IItemStack.of(recipe.getDrop());
     IDecomposedRecipe decomposition =
@@ -79,7 +84,7 @@ public class SiftingRecipeHandler implements IRecipeHandler<SiftingRecipe> {
   @Override
   public Optional<SiftingRecipe> recompose(
       IRecipeManager<? super SiftingRecipe> manager,
-      ResourceLocation name,
+      RegistryAccess registryAccess,
       IDecomposedRecipe recipe) {
     IIngredient input = recipe.getOrThrowSingle(BuiltinRecipeComponents.Input.INGREDIENTS);
     IItemStack drop = recipe.getOrThrowSingle(BuiltinRecipeComponents.Output.ITEMS);
@@ -95,11 +100,6 @@ public class SiftingRecipeHandler implements IRecipeHandler<SiftingRecipe> {
       throw new IllegalArgumentException("Invalid roll list: empty list");
     }
     return Optional.of(
-        new SiftingRecipe(
-            name,
-            input.asVanillaIngredient(),
-            drop.getInternal(),
-            isWaterlogged,
-            rolls.toArray(MeshWithChance[]::new)));
+        new SiftingRecipe(input.asVanillaIngredient(), drop.getInternal(), isWaterlogged, rolls));
   }
 }

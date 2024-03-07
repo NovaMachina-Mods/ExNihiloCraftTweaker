@@ -10,24 +10,27 @@ import com.blamejared.crafttweaker.api.recipe.handler.IRecipeHandler;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.util.StringUtil;
 import com.google.gson.reflect.TypeToken;
+import java.util.Optional;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import novamachina.exnihilosequentia.ExNihiloSequentia;
 import novamachina.exnihilosequentia.world.item.crafting.SolidifyingRecipe;
-
-import java.util.Optional;
 
 @IRecipeHandler.For(SolidifyingRecipe.class)
 public class SolidifyingRecipeHandler implements IRecipeHandler<SolidifyingRecipe> {
   @Override
   public String dumpToCommandString(
-      IRecipeManager<? super SolidifyingRecipe> manager, SolidifyingRecipe recipe) {
+      IRecipeManager<? super SolidifyingRecipe> manager,
+      RegistryAccess registryAccess,
+      RecipeHolder<SolidifyingRecipe> recipe) {
     return String.format(
         "<recipetype:exnihilosequentia:solidifying>.addRecipe(%s, %s, %s, %s);",
-        StringUtil.quoteAndEscape(recipe.getId()),
-        IFluidStack.of(recipe.getFluidInTank()).getCommandString(),
-        IFluidStack.of(recipe.getFluidOnTop()).getCommandString(),
-        IItemStack.of(recipe.getResult()).getCommandString());
+        StringUtil.quoteAndEscape(recipe.id()),
+        IFluidStack.of(recipe.value().getFluidInTank()).getCommandString(),
+        IFluidStack.of(recipe.value().getFluidOnTop()).getCommandString(),
+        IItemStack.of(recipe.value().getResult()).getCommandString());
   }
 
   @Override
@@ -54,7 +57,9 @@ public class SolidifyingRecipeHandler implements IRecipeHandler<SolidifyingRecip
 
   @Override
   public Optional<IDecomposedRecipe> decompose(
-      IRecipeManager<? super SolidifyingRecipe> manager, SolidifyingRecipe recipe) {
+      IRecipeManager<? super SolidifyingRecipe> manager,
+      RegistryAccess registryAccess,
+      SolidifyingRecipe recipe) {
     IFluidStack fluidInTank = IFluidStack.of(recipe.getFluidInTank());
     IFluidStack fluidOnTop = IFluidStack.of(recipe.getFluidOnTop());
     IItemStack result = IItemStack.of(recipe.getResult());
@@ -70,7 +75,7 @@ public class SolidifyingRecipeHandler implements IRecipeHandler<SolidifyingRecip
   @Override
   public Optional<SolidifyingRecipe> recompose(
       IRecipeManager<? super SolidifyingRecipe> manager,
-      ResourceLocation name,
+      RegistryAccess registryAccess,
       IDecomposedRecipe recipe) {
     IFluidStack fluidInTank = recipe.getOrThrowSingle(FLUID_INPUT_1);
     IFluidStack fluidOnTop = recipe.getOrThrowSingle(FLUID_INPUT_2);
@@ -87,6 +92,6 @@ public class SolidifyingRecipeHandler implements IRecipeHandler<SolidifyingRecip
     }
     return Optional.of(
         new SolidifyingRecipe(
-            name, fluidInTank.getInternal(), fluidOnTop.getInternal(), result.getInternal()));
+            fluidInTank.getInternal(), fluidOnTop.getInternal(), result.getInternal()));
   }
 }

@@ -10,8 +10,10 @@ import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.util.IngredientUtil;
 import com.blamejared.crafttweaker.api.util.StringUtil;
 import com.google.gson.reflect.TypeToken;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import novamachina.exnihilosequentia.ExNihiloSequentia;
 import novamachina.exnihilosequentia.world.item.crafting.HarvestRecipe;
 import novamachina.exnihilosequentia.world.item.crafting.ItemStackWithChance;
@@ -24,9 +26,9 @@ import java.util.StringJoiner;
 public class HarvestRecipeHandler implements IRecipeHandler<HarvestRecipe> {
   @Override
   public String dumpToCommandString(
-      IRecipeManager<? super HarvestRecipe> manager, HarvestRecipe recipe) {
+      IRecipeManager<? super HarvestRecipe> manager, RegistryAccess registryAccess, RecipeHolder<HarvestRecipe> recipe) {
     StringJoiner dropJoiner = new StringJoiner(", ");
-    for (ItemStackWithChance drop : recipe.getDrops()) {
+    for (ItemStackWithChance drop : recipe.value().getDrops()) {
       dropJoiner.add(
           String.format(
               "ItemStackWithChance.of(%s, %f)",
@@ -34,7 +36,7 @@ public class HarvestRecipeHandler implements IRecipeHandler<HarvestRecipe> {
     }
     return String.format(
         "<recipetype:exnihilosequentia:crushing>.addRecipe(%s, [%s]);",
-        StringUtil.quoteAndEscape(recipe.getId()), dropJoiner);
+        StringUtil.quoteAndEscape(recipe.id()), dropJoiner);
   }
 
   @Override
@@ -52,7 +54,7 @@ public class HarvestRecipeHandler implements IRecipeHandler<HarvestRecipe> {
 
   @Override
   public Optional<IDecomposedRecipe> decompose(
-      IRecipeManager<? super HarvestRecipe> manager, HarvestRecipe recipe) {
+      IRecipeManager<? super HarvestRecipe> manager, RegistryAccess registryAccess, HarvestRecipe recipe) {
     IIngredient ingredient = IIngredient.fromIngredient(recipe.getInput());
     IDecomposedRecipe decomposition =
         IDecomposedRecipe.builder()
@@ -68,7 +70,7 @@ public class HarvestRecipeHandler implements IRecipeHandler<HarvestRecipe> {
   @Override
   public Optional<HarvestRecipe> recompose(
       IRecipeManager<? super HarvestRecipe> manager,
-      ResourceLocation name,
+      RegistryAccess registryAccess,
       IDecomposedRecipe recipe) {
     IIngredient input = recipe.getOrThrowSingle(BuiltinRecipeComponents.Input.INGREDIENTS);
     List<ItemStackWithChance> drops = recipe.getOrThrowSingle(stackWithChance);
@@ -79,7 +81,6 @@ public class HarvestRecipeHandler implements IRecipeHandler<HarvestRecipe> {
       throw new IllegalArgumentException("Invalid drop list: empty list");
     }
     return Optional.of(
-        new HarvestRecipe(
-            name, input.asVanillaIngredient(), drops.toArray(ItemStackWithChance[]::new)));
+        new HarvestRecipe(input.asVanillaIngredient(), drops));
   }
 }

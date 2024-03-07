@@ -10,6 +10,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.mojang.serialization.JsonOps;
+import java.util.Map;
+import java.util.Optional;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,16 +23,14 @@ import net.minecraft.world.level.block.Blocks;
 import novamachina.exnihilosequentia.ExNihiloSequentia;
 import novamachina.exnihilosequentia.world.item.crafting.HeatRecipe;
 
-import java.util.Map;
-import java.util.Optional;
-
 @IRecipeHandler.For(HeatRecipe.class)
 public class HeatRecipeHandler implements IRecipeHandler<HeatRecipe> {
 
   private String encodeProperties(Optional<StatePropertiesPredicate> properties) {
     StringBuilder builder = new StringBuilder("StatePropertiesPredicate.create()");
-    if(properties.isPresent()) {
-      Optional<JsonElement> props = StatePropertiesPredicate.CODEC.encodeStart(JsonOps.INSTANCE, properties.get()).result();
+    if (properties.isPresent()) {
+      Optional<JsonElement> props =
+          StatePropertiesPredicate.CODEC.encodeStart(JsonOps.INSTANCE, properties.get()).result();
       for (Map.Entry<String, JsonElement> entry : props.get().getAsJsonObject().entrySet()) {
         builder.append(
             String.format(".property(\"%s\", <appropriate property value>)", entry.getKey()));
@@ -41,7 +41,10 @@ public class HeatRecipeHandler implements IRecipeHandler<HeatRecipe> {
   }
 
   @Override
-  public String dumpToCommandString(IRecipeManager<? super HeatRecipe> iRecipeManager, RegistryAccess registryAccess, RecipeHolder<HeatRecipe> recipeHolder) {
+  public String dumpToCommandString(
+      IRecipeManager<? super HeatRecipe> iRecipeManager,
+      RegistryAccess registryAccess,
+      RecipeHolder<HeatRecipe> recipeHolder) {
     ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(recipeHolder.value().getInputBlock());
     return String.format(
         "<recipetype:exnihilosequentia:heat>.addRecipe(%s, %d, %s, %s);",
@@ -60,7 +63,10 @@ public class HeatRecipeHandler implements IRecipeHandler<HeatRecipe> {
   }
 
   @Override
-  public Optional<IDecomposedRecipe> decompose(IRecipeManager<? super HeatRecipe> iRecipeManager, RegistryAccess registryAccess, HeatRecipe recipe) {
+  public Optional<IDecomposedRecipe> decompose(
+      IRecipeManager<? super HeatRecipe> iRecipeManager,
+      RegistryAccess registryAccess,
+      HeatRecipe recipe) {
 
     IDecomposedRecipe decomposition =
         IDecomposedRecipe.builder()
@@ -72,7 +78,10 @@ public class HeatRecipeHandler implements IRecipeHandler<HeatRecipe> {
   }
 
   @Override
-  public Optional<HeatRecipe> recompose(IRecipeManager<? super HeatRecipe> iRecipeManager, RegistryAccess registryAccess, IDecomposedRecipe recipe) {
+  public Optional<HeatRecipe> recompose(
+      IRecipeManager<? super HeatRecipe> iRecipeManager,
+      RegistryAccess registryAccess,
+      IDecomposedRecipe recipe) {
 
     Block input = recipe.getOrThrowSingle(BLOCK_INPUT);
     int amount = recipe.getOrThrowSingle(OUTPUT_AMOUNT);
@@ -88,8 +97,18 @@ public class HeatRecipeHandler implements IRecipeHandler<HeatRecipe> {
 
   private boolean compareProperties(
       Optional<StatePropertiesPredicate> first, Optional<StatePropertiesPredicate> second) {
-    JsonObject firstProps = StatePropertiesPredicate.CODEC.encodeStart(JsonOps.INSTANCE, first.get()).result().get().getAsJsonObject();
-    JsonObject secondProps = StatePropertiesPredicate.CODEC.encodeStart(JsonOps.INSTANCE, second.get()).result().get().getAsJsonObject();
+    JsonObject firstProps =
+        StatePropertiesPredicate.CODEC
+            .encodeStart(JsonOps.INSTANCE, first.get())
+            .result()
+            .get()
+            .getAsJsonObject();
+    JsonObject secondProps =
+        StatePropertiesPredicate.CODEC
+            .encodeStart(JsonOps.INSTANCE, second.get())
+            .result()
+            .get()
+            .getAsJsonObject();
     for (Map.Entry<String, JsonElement> entry : firstProps.entrySet()) {
       if (!secondProps.has(entry.getKey())) {
         return false;

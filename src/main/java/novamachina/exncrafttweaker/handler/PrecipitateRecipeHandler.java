@@ -12,24 +12,27 @@ import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.util.IngredientUtil;
 import com.blamejared.crafttweaker.api.util.StringUtil;
 import com.google.gson.reflect.TypeToken;
+import java.util.Optional;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import novamachina.exnihilosequentia.ExNihiloSequentia;
 import novamachina.exnihilosequentia.world.item.crafting.PrecipitateRecipe;
-
-import java.util.Optional;
 
 @IRecipeHandler.For(PrecipitateRecipe.class)
 public class PrecipitateRecipeHandler implements IRecipeHandler<PrecipitateRecipe> {
   @Override
   public String dumpToCommandString(
-      IRecipeManager<? super PrecipitateRecipe> manager, PrecipitateRecipe recipe) {
+      IRecipeManager<? super PrecipitateRecipe> manager,
+      RegistryAccess registryAccess,
+      RecipeHolder<PrecipitateRecipe> recipe) {
     return String.format(
         "<recipetype:exnihilosequentia:precipitate>.addRecipe(%s, %s, %s, %s);",
-        StringUtil.quoteAndEscape(recipe.getId()),
-        IFluidStack.of(recipe.getFluid()).getCommandString(),
-        IIngredient.fromIngredient(recipe.getInput()).getCommandString(),
-        IItemStack.of(recipe.getOutput()).getCommandString());
+        StringUtil.quoteAndEscape(recipe.id()),
+        IFluidStack.of(recipe.value().getFluid()).getCommandString(),
+        IIngredient.fromIngredient(recipe.value().getInput()).getCommandString(),
+        IItemStack.of(recipe.value().getOutput()).getCommandString());
   }
 
   @Override
@@ -50,7 +53,9 @@ public class PrecipitateRecipeHandler implements IRecipeHandler<PrecipitateRecip
 
   @Override
   public Optional<IDecomposedRecipe> decompose(
-      IRecipeManager<? super PrecipitateRecipe> manager, PrecipitateRecipe recipe) {
+      IRecipeManager<? super PrecipitateRecipe> manager,
+      RegistryAccess registryAccess,
+      PrecipitateRecipe recipe) {
     IFluidStack fluid = IFluidStack.of(recipe.getFluid());
     IIngredient input = IIngredient.fromIngredient(recipe.getInput());
     IItemStack output = IItemStack.of(recipe.getOutput());
@@ -68,7 +73,7 @@ public class PrecipitateRecipeHandler implements IRecipeHandler<PrecipitateRecip
   @Override
   public Optional<PrecipitateRecipe> recompose(
       IRecipeManager<? super PrecipitateRecipe> manager,
-      ResourceLocation name,
+      RegistryAccess registryAccess,
       IDecomposedRecipe recipe) {
     IFluidStack fluid = recipe.getOrThrowSingle(FLUID_INPUT);
     IIngredient input = recipe.getOrThrowSingle(BuiltinRecipeComponents.Input.INGREDIENTS);
@@ -85,6 +90,6 @@ public class PrecipitateRecipeHandler implements IRecipeHandler<PrecipitateRecip
     }
     return Optional.of(
         new PrecipitateRecipe(
-            name, fluid.getInternal(), input.asVanillaIngredient(), output.getInternal()));
+            fluid.getInternal(), input.asVanillaIngredient(), output.getInternal()));
   }
 }

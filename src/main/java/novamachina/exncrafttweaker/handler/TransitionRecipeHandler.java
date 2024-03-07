@@ -11,24 +11,27 @@ import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.util.IngredientUtil;
 import com.blamejared.crafttweaker.api.util.StringUtil;
 import com.google.gson.reflect.TypeToken;
+import java.util.Optional;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import novamachina.exnihilosequentia.ExNihiloSequentia;
 import novamachina.exnihilosequentia.world.item.crafting.TransitionRecipe;
-
-import java.util.Optional;
 
 @IRecipeHandler.For(TransitionRecipe.class)
 public class TransitionRecipeHandler implements IRecipeHandler<TransitionRecipe> {
   @Override
   public String dumpToCommandString(
-      IRecipeManager<? super TransitionRecipe> manager, TransitionRecipe recipe) {
+      IRecipeManager<? super TransitionRecipe> manager,
+      RegistryAccess registryAccess,
+      RecipeHolder<TransitionRecipe> recipe) {
     return String.format(
         "<recipetype:exnihilosequentia:transition>.addRecipe(%s, %s, %s, %s);",
-        StringUtil.quoteAndEscape(recipe.getId()),
-        IIngredient.fromIngredient(recipe.getCatalyst()).getCommandString(),
-        IFluidStack.of(recipe.getFluidInTank()).getCommandString(),
-        IFluidStack.of(recipe.getResult()).getCommandString());
+        StringUtil.quoteAndEscape(recipe.id()),
+        IIngredient.fromIngredient(recipe.value().getCatalyst()).getCommandString(),
+        IFluidStack.of(recipe.value().getFluidInTank()).getCommandString(),
+        IFluidStack.of(recipe.value().getResult()).getCommandString());
   }
 
   @Override
@@ -49,7 +52,9 @@ public class TransitionRecipeHandler implements IRecipeHandler<TransitionRecipe>
 
   @Override
   public Optional<IDecomposedRecipe> decompose(
-      IRecipeManager<? super TransitionRecipe> manager, TransitionRecipe recipe) {
+      IRecipeManager<? super TransitionRecipe> manager,
+      RegistryAccess registryAccess,
+      TransitionRecipe recipe) {
     IIngredient catalyst = IIngredient.fromIngredient(recipe.getCatalyst());
     IFluidStack fluidInTank = IFluidStack.of(recipe.getFluidInTank());
     IFluidStack result = IFluidStack.of(recipe.getResult());
@@ -65,7 +70,7 @@ public class TransitionRecipeHandler implements IRecipeHandler<TransitionRecipe>
   @Override
   public Optional<TransitionRecipe> recompose(
       IRecipeManager<? super TransitionRecipe> manager,
-      ResourceLocation name,
+      RegistryAccess registryAccess,
       IDecomposedRecipe recipe) {
     IIngredient catalyst = recipe.getOrThrowSingle(BuiltinRecipeComponents.Input.INGREDIENTS);
     IFluidStack fluidInTank = recipe.getOrThrowSingle(FLUID_INPUT);
@@ -83,6 +88,6 @@ public class TransitionRecipeHandler implements IRecipeHandler<TransitionRecipe>
 
     return Optional.of(
         new TransitionRecipe(
-            name, catalyst.asVanillaIngredient(), fluidInTank.getInternal(), result.getInternal()));
+            catalyst.asVanillaIngredient(), fluidInTank.getInternal(), result.getInternal()));
   }
 }

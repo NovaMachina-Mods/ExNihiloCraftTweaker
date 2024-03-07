@@ -8,24 +8,26 @@ import com.blamejared.crafttweaker.api.recipe.handler.IRecipeHandler;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.util.IngredientUtil;
 import com.blamejared.crafttweaker.api.util.StringUtil;
-import net.minecraft.resources.ResourceLocation;
+import java.util.Optional;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import novamachina.exnihilosequentia.world.item.crafting.MeltingRecipe;
 import novamachina.exnihilosequentia.world.level.block.entity.CrucibleBlockEntity;
-
-import java.util.Optional;
 
 @IRecipeHandler.For(MeltingRecipe.class)
 public class MeltingRecipeHandler implements IRecipeHandler<MeltingRecipe> {
   @Override
   public String dumpToCommandString(
-      IRecipeManager<? super MeltingRecipe> manager, MeltingRecipe recipe) {
+      IRecipeManager<? super MeltingRecipe> manager,
+      RegistryAccess registryAccess,
+      RecipeHolder<MeltingRecipe> recipe) {
     return String.format(
         "<recipetype:exnihilosequentia:compost>.addRecipe(%s, %s, %s, %s);",
-        StringUtil.quoteAndEscape(recipe.getId()),
-        IIngredient.fromIngredient(recipe.getInput()).getCommandString(),
-        IFluidStack.of(recipe.getResultFluid()).getCommandString(),
-        String.format("CrucibleType.%s()", recipe.getCrucibleType().getName()));
+        StringUtil.quoteAndEscape(recipe.id()),
+        IIngredient.fromIngredient(recipe.value().getInput()).getCommandString(),
+        IFluidStack.of(recipe.value().getResultFluid()).getCommandString(),
+        String.format("CrucibleType.%s()", recipe.value().getCrucibleType().getName()));
   }
 
   @Override
@@ -37,7 +39,9 @@ public class MeltingRecipeHandler implements IRecipeHandler<MeltingRecipe> {
 
   @Override
   public Optional<IDecomposedRecipe> decompose(
-      IRecipeManager<? super MeltingRecipe> manager, MeltingRecipe recipe) {
+      IRecipeManager<? super MeltingRecipe> manager,
+      RegistryAccess registryAccess,
+      MeltingRecipe recipe) {
     IIngredient input = IIngredient.fromIngredient(recipe.getInput());
     IFluidStack fluidStack = IFluidStack.of(recipe.getResultFluid());
     IDecomposedRecipe decomposition =
@@ -52,7 +56,7 @@ public class MeltingRecipeHandler implements IRecipeHandler<MeltingRecipe> {
   @Override
   public Optional<MeltingRecipe> recompose(
       IRecipeManager<? super MeltingRecipe> manager,
-      ResourceLocation name,
+      RegistryAccess registryAccess,
       IDecomposedRecipe recipe) {
     IIngredient input = recipe.getOrThrowSingle(BuiltinRecipeComponents.Input.INGREDIENTS);
     IFluidStack fluidStack = recipe.getOrThrowSingle(BuiltinRecipeComponents.Output.FLUIDS);
@@ -71,6 +75,6 @@ public class MeltingRecipeHandler implements IRecipeHandler<MeltingRecipe> {
     }
 
     return Optional.of(
-        new MeltingRecipe(name, input.asVanillaIngredient(), fluidStack.getInternal(), type));
+        new MeltingRecipe(input.asVanillaIngredient(), fluidStack.getInternal(), type));
   }
 }

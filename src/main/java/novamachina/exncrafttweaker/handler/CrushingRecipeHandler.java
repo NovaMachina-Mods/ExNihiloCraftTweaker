@@ -10,23 +10,26 @@ import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.util.IngredientUtil;
 import com.blamejared.crafttweaker.api.util.StringUtil;
 import com.google.gson.reflect.TypeToken;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Recipe;
-import novamachina.exnihilosequentia.ExNihiloSequentia;
-import novamachina.exnihilosequentia.world.item.crafting.CrushingRecipe;
-import novamachina.exnihilosequentia.world.item.crafting.ItemStackWithChance;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import novamachina.exnihilosequentia.ExNihiloSequentia;
+import novamachina.exnihilosequentia.world.item.crafting.CrushingRecipe;
+import novamachina.exnihilosequentia.world.item.crafting.ItemStackWithChance;
 
 @IRecipeHandler.For(CrushingRecipe.class)
 public class CrushingRecipeHandler implements IRecipeHandler<CrushingRecipe> {
   @Override
   public String dumpToCommandString(
-      IRecipeManager<? super CrushingRecipe> manager, CrushingRecipe recipe) {
+      IRecipeManager<? super CrushingRecipe> manager,
+      RegistryAccess registryAccess,
+      RecipeHolder<CrushingRecipe> recipe) {
     StringJoiner dropJoiner = new StringJoiner(", ");
-    for (ItemStackWithChance drop : recipe.getDrops()) {
+    for (ItemStackWithChance drop : recipe.value().getDrops()) {
       dropJoiner.add(
           String.format(
               "ItemStackWithChance.of(%s, %f)",
@@ -34,7 +37,7 @@ public class CrushingRecipeHandler implements IRecipeHandler<CrushingRecipe> {
     }
     return String.format(
         "<recipetype:exnihilosequentia:crushing>.addRecipe(%s, [%s]);",
-        StringUtil.quoteAndEscape(recipe.getId()), dropJoiner);
+        StringUtil.quoteAndEscape(recipe.id()), dropJoiner);
   }
 
   @Override
@@ -52,7 +55,9 @@ public class CrushingRecipeHandler implements IRecipeHandler<CrushingRecipe> {
 
   @Override
   public Optional<IDecomposedRecipe> decompose(
-      IRecipeManager<? super CrushingRecipe> manager, CrushingRecipe recipe) {
+      IRecipeManager<? super CrushingRecipe> manager,
+      RegistryAccess registryAccess,
+      CrushingRecipe recipe) {
     IIngredient ingredient = IIngredient.fromIngredient(recipe.getInput());
     IDecomposedRecipe decomposition =
         IDecomposedRecipe.builder()
@@ -68,7 +73,7 @@ public class CrushingRecipeHandler implements IRecipeHandler<CrushingRecipe> {
   @Override
   public Optional<CrushingRecipe> recompose(
       IRecipeManager<? super CrushingRecipe> manager,
-      ResourceLocation name,
+      RegistryAccess registryAccess,
       IDecomposedRecipe recipe) {
     IIngredient input = recipe.getOrThrowSingle(BuiltinRecipeComponents.Input.INGREDIENTS);
     List<ItemStackWithChance> drops = recipe.getOrThrowSingle(stackWithChance);
@@ -78,8 +83,6 @@ public class CrushingRecipeHandler implements IRecipeHandler<CrushingRecipe> {
     if (drops.isEmpty()) {
       throw new IllegalArgumentException("Invalid drop list: empty list");
     }
-    return Optional.of(
-        new CrushingRecipe(
-            name, input.asVanillaIngredient(), drops.toArray(ItemStackWithChance[]::new)));
+    return Optional.of(new CrushingRecipe(input.asVanillaIngredient(), drops));
   }
 }

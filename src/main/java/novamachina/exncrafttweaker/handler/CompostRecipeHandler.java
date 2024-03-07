@@ -10,8 +10,10 @@ import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.util.IngredientUtil;
 import com.blamejared.crafttweaker.api.util.StringUtil;
 import com.google.gson.reflect.TypeToken;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import novamachina.exnihilosequentia.ExNihiloSequentia;
 import novamachina.exnihilosequentia.world.item.crafting.CompostRecipe;
 
@@ -21,12 +23,12 @@ import java.util.Optional;
 public class CompostRecipeHandler implements IRecipeHandler<CompostRecipe> {
   @Override
   public String dumpToCommandString(
-      IRecipeManager<? super CompostRecipe> manager, CompostRecipe recipe) {
+      IRecipeManager<? super CompostRecipe> manager, RegistryAccess registryAccess, RecipeHolder<CompostRecipe> recipe) {
     return String.format(
         "<recipetype:exnihilosequentia:compost>.addRecipe(%s, %s, %d);",
-        StringUtil.quoteAndEscape(recipe.getId()),
-        IIngredient.fromIngredient(recipe.getInput()).getCommandString(),
-        recipe.getAmount());
+        StringUtil.quoteAndEscape(recipe.id()),
+        IIngredient.fromIngredient(recipe.value().getInput()).getCommandString(),
+        recipe.value().getAmount());
   }
 
   @Override
@@ -44,7 +46,7 @@ public class CompostRecipeHandler implements IRecipeHandler<CompostRecipe> {
 
   @Override
   public Optional<IDecomposedRecipe> decompose(
-      IRecipeManager<? super CompostRecipe> manager, CompostRecipe recipe) {
+      IRecipeManager<? super CompostRecipe> manager, RegistryAccess registryAccess, CompostRecipe recipe) {
     IIngredient ingredient = IIngredient.fromIngredient(recipe.getInput());
     IDecomposedRecipe decomposition =
         IDecomposedRecipe.builder()
@@ -57,7 +59,7 @@ public class CompostRecipeHandler implements IRecipeHandler<CompostRecipe> {
   @Override
   public Optional<CompostRecipe> recompose(
       IRecipeManager<? super CompostRecipe> manager,
-      ResourceLocation name,
+      RegistryAccess registryAccess,
       IDecomposedRecipe recipe) {
     IIngredient input = recipe.getOrThrowSingle(BuiltinRecipeComponents.Input.INGREDIENTS);
     int amount = recipe.getOrThrowSingle(outputAmount);
@@ -68,6 +70,6 @@ public class CompostRecipeHandler implements IRecipeHandler<CompostRecipe> {
     if (amount <= 0) {
       throw new IllegalArgumentException("Invalid amount: less than min allowed 1: " + amount);
     }
-    return Optional.of(new CompostRecipe(name, input.asVanillaIngredient(), amount));
+    return Optional.of(new CompostRecipe(input.asVanillaIngredient(), amount));
   }
 }
