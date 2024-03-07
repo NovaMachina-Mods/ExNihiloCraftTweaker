@@ -1,0 +1,15 @@
+---
+blank_issues_enabled: false
+contact_links:
+  - name: "Discord"
+    url: https://discord.gg/CJyAkuw/
+    about: Active Discord for updates and discussion
+  - name: "Wiki"
+    url: https://NovaMachina-Mods.github.io/
+    about: "Wiki for NovaMachina Mods"
+  - name: "Discussion Board"
+    url: https://github.com/NovaMachina-Mods/ExNihiloSequentia/discussions
+    about: Discussions, Q&A, Requests, etc.
+  - name: "Issue Board"
+    url: https://github.com/NovaMachina-Mods/ExNihiloJEI/issues
+    about: All issues and feature requests end up here
