@@ -1,11 +1,11 @@
-![CurseForge Downloads](https://img.shields.io/curseforge/dt/983646?style=for-the-badge&logo=curseforge)
-![CurseForge Downloads](https://img.shields.io/curseforge/game-versions/983646?style=for-the-badge&logo=curseforge)
-![Modrinth Downloads](https://img.shields.io/modrinth/dt/90jIwmar?style=for-the-badge&logo=modrinth)
-![Modrinth Downloads](https://img.shields.io/modrinth/game-versions/90jIwmar?style=for-the-badge&logo=modrinth)
+![CurseForge Downloads](https://img.shields.io/curseforge/dt/984166?style=for-the-badge&logo=curseforge)
+![CurseForge Downloads](https://img.shields.io/curseforge/game-versions/984166?style=for-the-badge&logo=curseforge)
+![Modrinth Downloads](https://img.shields.io/modrinth/dt/orq1Zksc?style=for-the-badge&logo=modrinth)
+![Modrinth Downloads](https://img.shields.io/modrinth/game-versions/orq1Zksc?style=for-the-badge&logo=modrinth)
 ![Static Badge](https://img.shields.io/badge/license-CC_BY--NC--SA_4.0-green?style=for-the-badge)
-![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/NovaMachina-Mods/ExNihiloJEI?style=for-the-badge&logo=github)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/NovaMachina-Mods/ExNihiloJEI/build_1_20.yaml?style=for-the-badge&logo=github&label=1.20%20Build)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/NovaMachina-Mods/ExNihiloJEI/build_1_20_dev.yaml?style=for-the-badge&logo=github&label=1.20-dev%20Build)
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/NovaMachina-Mods/ExNihiloCraftTweaker?style=for-the-badge&logo=github)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/NovaMachina-Mods/ExNihiloCraftTweaker/build_1_20.yaml?style=for-the-badge&logo=github&label=1.20%20Build)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/NovaMachina-Mods/ExNihiloCraftTweaker/build_1_20_dev.yaml?style=for-the-badge&logo=github&label=1.20-dev%20Build)
 
 # Ex Nihilo: Sequentia - CraftTweaker Addon
 
